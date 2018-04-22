@@ -1,0 +1,21 @@
+extends ../layouts/layout
+
+block content
+  header.jumbotron
+    h1 Welcome to HikingTrails!
+    p View our hand-picked trails from all over the world
+    p: a.btn.btn-secondary.btn-lg(href="/trails/new") Add New Trail
+  .row
+    if noMatch
+      .col-12: p= noMatch
+    else
+      each trail in trails
+        - const { image, name, location, _id } = trail;
+        .col-sm-6.col-md-4.col-lg-3
+          .card.mb-3
+            img.card-img-top(src=image)
+            div.card-body
+              h5.card-title #{name}
+              p.card-subtitle.text-muted #{location}
+            div.card-body
+              a.card-link(href="/trails/" + _id) More Info

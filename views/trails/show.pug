@@ -1,0 +1,54 @@
+extends ../layouts/layout
+
+block content
+  - const {  _id: trailId, createdAt: trailCreatedAt, author: trailAuthor, name, estimatedTime, image, description, location, lat, lng, comments } = trail;
+
+  .row
+    .col-md-3
+      #map
+    .col-md-9
+      .card.mb-4
+        img.card-img-top(src=image alt=name)
+        div.card-body.figure-caption
+          h5.float-right ~#{moment.duration(parseInt(estimatedTime), 'minutes').humanize()}
+          h5: a(href="#") #{name}
+          p #{description}
+          p: em Submitted by: #[a(href=`/users/${trailAuthor.id}`) #{trailAuthor.username}], #{moment(trailCreatedAt).fromNow()}
+          if user && (trailAuthor.id.equals(user._id) || user.isAdmin)
+            a.btn.btn-sm.btn-outline-secondary.mr-2(href=`/trails/${trailId}/edit`) Edit
+            form.d-inline(action=`/trails/${trailId}?_method=DELETE` method="POST")
+              button.btn.btn-sm.btn-outline-danger Delete
+      .card.bg-light
+        .card-body
+          .text-right
+            a.btn.btn-sm.btn-outline-success(href=`/trails/${trailId}/comments/new`) Add New Comment
+          hr
+          each comment in comments
+            - const { _id: commentId, createdAt: commentCreatedAt, author: commentAuthor , text } = comment;
+            .row.my-4
+              .col-md-12
+                strong #{commentAuthor.username}
+                span.float-right #{moment(commentCreatedAt).fromNow()}
+                p #{text}
+                if user && (commentAuthor.id.equals(user._id) || user.isAdmin)
+                  a.btn.btn-sm.btn-outline-secondary.mr-2(href=`/trails/${trailId}/comments/${commentId}/edit`) Edit
+                  form.d-inline(action=`/trails/${trailId}/comments/${commentId}?_method=DELETE` method="POST")
+                    button.btn.btn-sm.btn-outline-danger Delete
+block scripts
+
+  script(type='text/javascript').
+    function initMap() {
+      const lat = #{lat},
+        lng = #{lng},
+        name = #[| '#{name}'];
+      const center = { lat, lng };
+      const map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 8,
+          center
+      });
+      const marker = new google.maps.Marker({
+          position: center,
+          map
+      });
+    }
+  script(async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcPdVnaRp4htTr7WSzJVVwUTutCOpGYkU&callback=initMap")

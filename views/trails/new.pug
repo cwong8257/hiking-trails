@@ -1,0 +1,24 @@
+extends ../layouts/layout
+
+block content
+  h1.text-center.mb-4 Create a New Trail
+  .row
+    .col-sm-10.col-md-8.col-lg-6.col-xl-4.mx-auto
+      form.mb-2(action="/trails" method="POST" enctype="multipart/form-data")
+        .form-group
+          label(for="name") Name
+          input.form-control(type="text" name="trail[name]" id="name" placeholder="Yosemite" required)
+        .form-group
+          label(for="estimatedTime") Estimated Time (minutes)
+          input.form-control(type="number" name="trail[estimatedTime]" id="estimatedTime" placeholder="9.99" min="0.00" step="0.01" required)
+        .form-group
+          label(for="image") Image
+          input.form-control(type="file" name="image" id="image" accept="image/*" required)
+        .form-group
+          label(for="location") Location
+          input.form-control(type="text" name="trail[location]" id="location" placeholder="Yosemite National Park, CA")
+        .form-group
+          label(for="description") Description
+          input.form-control(type="text" name="trail[description]" id="description" placeholder="California’s Sierra Nevada mountains")
+        button.btn.btn-lg.btn-primary.btn-block Save
+      a(href="/trails") Go back

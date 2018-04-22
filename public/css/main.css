@@ -1,0 +1,15 @@
+#map {
+  height: 500px;
+  width: 100%;
+}
+
+.bg-black {
+  background-color: #000;
+}
+
+.img-responsive {
+  height: 7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

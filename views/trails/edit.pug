@@ -1,0 +1,28 @@
+extends ../layouts/layout
+
+block content
+  - const { _id, name, estimatedTime, image, location, description } = trail
+
+  h1.text-center.mb-4 Edit #{name}
+  .row
+    .col-sm-10.col-md-8.col-lg-6.col-xl-4.mx-auto
+
+      form.mb-2(action=`/trails/${_id}?_method=PUT` method="POST" enctype="multipart/form-data")
+        .form-group
+          label(for="name") Name
+          input.form-control(type="text" name="trail[name]" id="name" placeholder="Yosemite" value=name)
+        .form-group
+          label(for="estimatedTime") Estimated Time (minutes)
+          input.form-control(type="number" name="trail[estimatedTime]" id="estimatedTime" placeholder="9.99" min="1" step="1" value=estimatedTime required)
+        .form-group
+          label(for="image") Image
+          input.form-control(type="file" name="image" id="image" accept="image/*")
+        .form-group
+          label(for="location") Location
+          input.form-control(type="text" name="location" id="location" placeholder="Yosemite National Park, CA" value=location)
+        .form-group
+          label(for="description") Description
+          input.form-control(type="text" name="trail[description]" id="description" placeholder="California’s Sierra Nevada mountains" value=description)
+        button.btn.btn-lg.btn-primary.btn-block Save Changes
+
+      a(href="/trails") Go back

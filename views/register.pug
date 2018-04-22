@@ -1,0 +1,24 @@
+extends layouts/layout
+
+block content
+  h1.text-center.mb-4 Sign Up!
+  .row
+    .col-sm-8.col-md-6.col-lg-4.mx-auto
+      form.mb-2(action="/register" method="POST")
+        .form-group
+          label(for="firstName") First Name
+          input.form-control(type="text" name="firstName" id="firstName" autofocus required)
+        .form-group
+          label(for="lastName") Last Name
+          input.form-control(type="text" name="lastName" id="lastName" required)
+        .form-group
+          label(for='email') Email
+          input.form-control(type="email" name="email" id="email" required)
+        .form-group
+          label(for='username') Username
+          input.form-control(type="text" name="username" id="username" required)
+        .form-group
+          label(for='password') Password
+          input.form-control(type="password" name="password" id="password" required)
+        button.btn.btn-lg.btn-primary.btn-block Sign Up
+      a(href="/trails") Go back
