@@ -19,5 +19,24 @@ block content
             div.card-body
               h5.card-title #{name}
               p.card-subtitle.text-muted #{location}
-            div.card-body
-              a.card-link(href="/trails/" + _id) More Info
+            div.card-body: a.card-link(href="/trails/" + _id) More Info
+  if pages && pages > 0
+    .row
+      .col-12
+        nav(aria-label='Page navigation')
+          ul.pagination.justify-content-center
+            li.page-item(class={disabled: current === 1}): a.page-link(href=`/trails?page=1`) First
+            li.page-item(class={disabled: current === 1}): a.page-link(href=`/trails?page=${current - 1}`): span.oi.oi-chevron-left
+            - let i = Number(current) > 5 ? Number(current) - 4 : 1
+            if i !== 1
+              li.page-item.disabled: a.page-link(href='#') ...
+            while i <= (Number(current) + 4) && i <= pages
+              if i === current
+                li.page-item.active: a.page-link(href=`/trails?page=${i}`)= i
+              else
+                li.page-item: a.page-link(href=`/trails?page=${i}`)= i
+              if i == Number(current) + 4 && i < pages
+                li.page-item.disabled: a.page-link(href='#') ...
+              - i++;
+            li.page-item(class={disabled: current === pages}): a.page-link(href=`/trails?page=${current + 1}`): span.oi.oi-chevron-right
+            li.page-item(class={disabled: current === pages}): a.page-link(href=`/trails?page=${pages}`) Last

@@ -12,32 +12,39 @@ const escapeRegex = text => {
   return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 };
 
-router.get('/', (req, res) => {
-  let noMatch = null;
+router.get('/', async (req, res) => {
   const { search } = req.query;
+  const perPage = 8;
+  const pageQuery = parseInt(req.query.page);
+  const pageNumber = pageQuery ? pageQuery : 1;
 
   if (search) {
     const regex = new RegExp(escapeRegex(search), 'gi');
-    Trail.find({ name: regex })
-      .then(trails => {
-        if (trails.length === 0) {
-          noMatch = 'No trails match that query, please try again.';
-        }
-        res.render('trails/index', { trails, noMatch, page: 'trails' });
-      })
-      .catch(err => {
-        req.flash('error', err.message);
-        res.redirect('back');
-      });
+
+    try {
+      let noMatch = null;
+      const trails = await Trail.find({ name: regex });
+      if (trails.length === 0) {
+        noMatch = 'No trails found. Please try again.';
+      }
+      res.render('trails/index', { trails, noMatch, page: 'trails' });
+    } catch (err) {
+      req.flash('error', err.message);
+      res.redirect('back');
+    }
   } else {
-    Trail.find()
-      .then(trails => {
-        res.render('trails/index', { trails, page: 'trails' });
-      })
-      .catch(err => {
-        req.flash('error', err.message);
-        res.redirect('back');
-      });
+    try {
+      const trails = await Trail.find()
+        .skip(perPage * pageNumber - perPage)
+        .limit(perPage)
+        .exec();
+      const count = await Trail.count().exec();
+      const pages = Math.ceil(count / perPage);
+      res.render('trails/index', { trails, current: pageNumber, pages, page: 'trails' });
+    } catch (err) {
+      req.flash('error', err.message);
+      res.redirect('back');
+    }
   }
 });
 
