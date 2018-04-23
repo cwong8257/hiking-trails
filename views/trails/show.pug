@@ -18,51 +18,48 @@ block content
               | #[span.oi.oi-pencil(aria-hidden="true")] Edit
             form.d-inline(action=`/trails/${trailId}?_method=DELETE` method="POST")
               button.btn.btn-sm.btn-danger #[span.oi.oi-trash(aria-hidden="true")] Delete
-      .card.mb-4
-        .card-body
-          iframe.border-0(height="250px" width="100%" src=`https://forecast.io/embed/#lat=${lat}&lon=${lng}&name=${name}&color=#00aaff&font=Georgia&units=us`)
-      .card.mb-4
-        .card-body
-          .card-title.d-md-flex.justify-content-between.align-items-start
-            h5 Comments #[span.oi.oi-comment-square(aria-hidden="true")]
-            a.btn.btn-sm.btn-success(data-toggle="collapse" href="#collapseComment" role="button" aria-expanded="false" aria-controls="commentForm")
-              | #[span.oi.oi-plus(aria-hidden="true")] Add New Comment
-          .collapse#collapseComment
-            .card.rounded-0.border-top-0.border-right-0.border-bottom-0.border-success
-              .card-body
-                if !user
-                  h5 You need to login before you can comment.
-                  | #[a(href="/login") Click here] to go to the login page.
-                else
-                  h5 Write your comment #[span.oi.oi-pencil(aria-hidden="true")]
-                  form#addCommentForm(action=`/trails/${trailId}/comments` method="POST")
-                    .form-group
-                      input.form-control(type="text" value=user.username disabled)
-                    .form-group
-                      textarea.form-control(name="comment[text]" placeholder="Write your comment..." form="addCommentForm" rows="5" cols="70")
-                    button.btn.btn-sm.btn-success #[span.oi.oi-comment-square(aria-hidden="true")] Comment
-          each comment in comments
-            - const { _id: commentId, createdAt: commentCreatedAt, author: commentAuthor , text } = comment;
-            .row.my-4
-              .col-md-12
-                hr
-                strong
-                  h5
-                    span.oi.oi-person
-                    |
-                    |
-                    a.badge(class={
-                      'badge-info': user && user._id.equals(commentAuthor.id),
-                      'badge-primary': trailAuthor.id.equals(commentAuthor.id)
-                    } href=`/users/${commentAuthor.id}`)= commentAuthor.username
-                span.float-right= moment(commentCreatedAt).fromNow()
-                p= text
-                if user && (commentAuthor.id.equals(user._id) || user.isAdmin)
-                  a.btn.btn-sm.btn-secondary.mr-2(href=`/trails/${trailId}/comments/${commentId}/edit`)
-                    | #[span.oi.oi-pencil(aria-hidden="true")] Edit
-                  form.d-inline(action=`/trails/${trailId}/comments/${commentId}?_method=DELETE` method="POST")
-                    button.btn.btn-sm.btn-danger
-                      | #[span.oi.oi-trash(aria-hidden="true")] Delete
+      iframe.border-0.mb-4(height="250px" width="100%" src=`https://forecast.io/embed/#lat=${lat}&lon=${lng}&name=${location}&color=#00aaff&font=Georgia&units=us`)
+      hr
+      .d-md-flex.justify-content-between.align-items-start
+        h5 Comments #[span.oi.oi-comment-square(aria-hidden="true")]
+        a.btn.btn-sm.btn-success(data-toggle="collapse" href="#collapseComment" role="button" aria-expanded="false" aria-controls="commentForm")
+          | #[span.oi.oi-plus(aria-hidden="true")] Add New Comment
+      .collapse#collapseComment
+        .card.rounded-0.border-top-0.border-right-0.border-bottom-0.border-success
+          .card-body
+            if !user
+              h5 You need to login before you can comment.
+              | #[a(href="/login") Click here] to go to the login page.
+            else
+              h5 Write your comment #[span.oi.oi-pencil(aria-hidden="true")]
+              form#addCommentForm(action=`/trails/${trailId}/comments` method="POST")
+                .form-group
+                  input.form-control(type="text" value=user.username disabled)
+                .form-group
+                  textarea.form-control(name="comment[text]" placeholder="Write your comment..." form="addCommentForm" rows="5" cols="70")
+                button.btn.btn-sm.btn-success #[span.oi.oi-comment-square(aria-hidden="true")] Comment
+      each comment in comments
+        - const { _id: commentId, createdAt: commentCreatedAt, author: commentAuthor , text } = comment;
+        .row.my-4
+          .col-md-12
+            hr
+            strong
+              h5
+                span.oi.oi-person
+                |
+                |
+                a.badge(class={
+                  'badge-info': user && user._id.equals(commentAuthor.id),
+                  'badge-primary': trailAuthor.id.equals(commentAuthor.id)
+                } href=`/users/${commentAuthor.id}`)= commentAuthor.username
+            span.float-right= moment(commentCreatedAt).fromNow()
+            p= text
+            if user && (commentAuthor.id.equals(user._id) || user.isAdmin)
+              a.btn.btn-sm.btn-secondary.mr-2(href=`/trails/${trailId}/comments/${commentId}/edit`)
+                | #[span.oi.oi-pencil(aria-hidden="true")] Edit
+              form.d-inline(action=`/trails/${trailId}/comments/${commentId}?_method=DELETE` method="POST")
+                button.btn.btn-sm.btn-danger
+                  | #[span.oi.oi-trash(aria-hidden="true")] Delete
     .col-md-3.order-md-0
       #map.mb-4
 block scripts
