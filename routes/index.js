@@ -16,27 +16,19 @@ router.get('/register', (req, res) => {
   res.render('register', { page: 'register' });
 });
 
-router.post('/register', (req, res) => {
-  const { firstName, lastName, email, username, password } = req.body;
-  const newUser = new User({ firstName, lastName, email, username });
+router.post('/register', async (req, res) => {
+  const { firstName, lastName, email, username, password, biography } = req.body;
+  const newUser = new User({ firstName, lastName, email, username, biography });
 
-  User.register(newUser, password)
-    .then(user => {
-      passport.authenticate('local')(req, res, () => {
-        req.flash('error', `Welcome to HikingTrails ${user.username}!`);
-        res.redirect('/trails');
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      const errors = {
-        '11000': 'A user with the given email is already registered'
-      };
-      const message = errors[err.code] || err.message;
-
-      req.flash('error', message);
-      res.redirect('back');
-    });
+  try {
+    const user = await User.register(newUser, password);
+    await passport.authenticate('local')(req, res);
+    req.flash('success', `Welcome to HikingTrails ${user.username}!`);
+    res.redirect('/trails');
+  } catch (err) {
+    req.flash('error', err.message);
+    res.redirect('back');
+  }
 });
 
 router.get('/login', (req, res) => {
