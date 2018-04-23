@@ -3,7 +3,7 @@ extends ../layouts/layout
 block content
   - const {  _id: trailId, createdAt: trailCreatedAt, author: trailAuthor, name, estimatedTime, image, description, location, lat, lng, comments } = trail;
 
-  .row.text-muted
+  .row
     .col-md-9.order-md-1
       .card.mb-4
         img.card-img-top(src=image alt=name)
@@ -18,6 +18,9 @@ block content
               | #[span.oi.oi-pencil(aria-hidden="true")] Edit
             form.d-inline(action=`/trails/${trailId}?_method=DELETE` method="POST")
               button.btn.btn-sm.btn-danger #[span.oi.oi-trash(aria-hidden="true")] Delete
+      .card.mb-4
+        .card-body
+          iframe.border-0(height="250px" width="100%" src=`https://forecast.io/embed/#lat=${lat}&lon=${lng}&name=${name}&color=#00aaff&font=Georgia&units=us`)
       .card.mb-4
         .card-body
           .card-title.d-md-flex.justify-content-between.align-items-start
