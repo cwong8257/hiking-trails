@@ -6,7 +6,7 @@ block content
   h1.text-center.mb-4 Edit Comment
   .row
     .col-sm-10.col-md-8.col-lg-6.col-xl-4.mx-auto
-      form(action=`/trails/${trailId}/comments/${commentId}?_method=PUT`, method="POST")
+      form(action=`/trails/${trailId}/comments/${commentId}?_method=PUT` method="POST")
         .form-group
           input.form-control(type="text" name="comment[text]" placeholder="text" value=text)
         button.btn.btn-lg.btn-primary.btn-block Submit!
