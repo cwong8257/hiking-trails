@@ -4,7 +4,9 @@ block content
   header.jumbotron
     h1 Welcome to HikingTrails!
     p View our hand-picked trails from all over the world
-    p: a.btn.btn-secondary.btn-lg(href="/trails/new") Add New Trail
+    p
+      a.btn.btn-secondary.btn-lg(href="/trails/new")
+        | #[span.oi.oi-plus(aria-hidden="true")] Add New Trail
   .row
     if noMatch
       .col-12: p= noMatch

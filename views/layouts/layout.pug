@@ -11,20 +11,27 @@ html(lang="en")
   body
     nav.navbar.navbar-expand-md.navbar-dark.bg-dark.mb-4
       .container
-        a.navbar-brand(href="/trails") HikingTrails
+        a.navbar-brand.mr-5(href="/trails") HikingTrails
         button.navbar-toggler(type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation")
           span.navbar-toggler-icon
         .collapse.navbar-collapse#navbarSupportedContent
-          form.form-inline.mt-2.mt-md-0.mr-auto.order-md-0(action="/trails" method="GET")
-            input.form-control.mr-sm-2(type="search" name="search" placeholder="Search trails...")
-            button.btn.btn-outline-success.my-2.my-sm-0 Search
-          ul.navbar-nav.order-md-1
+          form.form.my-2.my-md-0.mr-auto(action="/trails" method="GET")
+            .input-group
+              input.form-control.border-right-0.border-secondary(type="search" name="search" placeholder="Search trails...")
+              span.input-group-append
+                button.btn.btn-outline-secondary.border-left-0.border-secondary
+                  span.oi.oi-magnifying-glass(aria-hidden="true")
+          ul.navbar-nav
             if !user
-              li.nav-item(class={active: page === 'login'}): a.nav-link(href="/login") Login
-              li.nav-item(class={active: page === 'register'}): a.nav-link(href="/register") Sign Up
+              li.nav-item(class={active: page === 'login'}): a.nav-link(href="/login")
+                | #[span.oi.oi-account-login] Login
+              li.nav-item(class={active: page === 'register'}): a.nav-link(href="/register")
+                | #[span.oi.oi-person] Sign Up
             else
-              li.nav-item.active: a.nav-link(href=`/users/${user._id}`) Signed in as #{user.username}
-              li.nav-item: a.nav-link(href="/logout") Logout
+              li.nav-item.active: a.nav-link(href=`/users/${user._id}`)
+                | #[span.oi.oi-person] #{user.username}
+              li.nav-item: a.nav-link(href="/logout")
+                | #[span.oi.oi-account-logout] Logout
     .container
       if success.length > 0
         .alert.alert-success(role="alert")

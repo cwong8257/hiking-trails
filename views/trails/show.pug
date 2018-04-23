@@ -3,39 +3,66 @@ extends ../layouts/layout
 block content
   - const {  _id: trailId, createdAt: trailCreatedAt, author: trailAuthor, name, estimatedTime, image, description, location, lat, lng, comments } = trail;
 
-  .row
-    .col-md-3
-      #map
-    .col-md-9
+  .row.text-muted
+    .col-md-9.order-md-1
       .card.mb-4
         img.card-img-top(src=image alt=name)
-        div.card-body.figure-caption
-          h5.float-right ~#{moment.duration(parseInt(estimatedTime), 'minutes').humanize()}
-          h5: a(href="#") #{name}
-          p #{description}
+        div.card-body
+          h5.float-right
+            | #[span.oi.oi-timer] ~#{moment.duration(parseInt(estimatedTime), 'minutes').humanize()}
+          h5= name
+          p= description
           p: em Submitted by: #[a(href=`/users/${trailAuthor.id}`) #{trailAuthor.username}], #{moment(trailCreatedAt).fromNow()}
           if user && (trailAuthor.id.equals(user._id) || user.isAdmin)
-            a.btn.btn-sm.btn-outline-secondary.mr-2(href=`/trails/${trailId}/edit`) Edit
+            a.btn.btn-sm.btn-secondary.mr-2(href=`/trails/${trailId}/edit`)
+              | #[span.oi.oi-pencil(aria-hidden="true")] Edit
             form.d-inline(action=`/trails/${trailId}?_method=DELETE` method="POST")
-              button.btn.btn-sm.btn-outline-danger Delete
-      .card.bg-light
+              button.btn.btn-sm.btn-danger #[span.oi.oi-trash(aria-hidden="true")] Delete
+      .card.mb-4
         .card-body
-          .text-right
-            a.btn.btn-sm.btn-outline-success(href=`/trails/${trailId}/comments/new`) Add New Comment
-          hr
+          .card-title.d-md-flex.justify-content-between.align-items-start
+            h5 Comments #[span.oi.oi-comment-square(aria-hidden="true")]
+            a.btn.btn-sm.btn-success(data-toggle="collapse" href="#collapseComment" role="button" aria-expanded="false" aria-controls="commentForm")
+              | #[span.oi.oi-plus(aria-hidden="true")] Add New Comment
+          .collapse#collapseComment
+            .card.rounded-0.border-top-0.border-right-0.border-bottom-0.border-success
+              .card-body
+                if !user
+                  h5 You need to login before you can comment.
+                  | #[a(href="/login") Click here] to go to the login page.
+                else
+                  h5 Write your comment #[span.oi.oi-pencil(aria-hidden="true")]
+                  form#addCommentForm(action=`/trails/${trailId}/comments` method="POST")
+                    .form-group
+                      input.form-control(type="text" value=user.username disabled)
+                    .form-group
+                      textarea.form-control(name="comment[text]" placeholder="Write your comment..." form="addCommentForm" rows="5" cols="70")
+                    button.btn.btn-sm.btn-success #[span.oi.oi-comment-square(aria-hidden="true")] Comment
           each comment in comments
             - const { _id: commentId, createdAt: commentCreatedAt, author: commentAuthor , text } = comment;
             .row.my-4
               .col-md-12
-                strong #{commentAuthor.username}
-                span.float-right #{moment(commentCreatedAt).fromNow()}
-                p #{text}
+                hr
+                strong
+                  h5
+                    span.oi.oi-person
+                    |
+                    |
+                    a.badge(class={
+                      'badge-info': user && user._id.equals(commentAuthor.id),
+                      'badge-primary': trailAuthor.id.equals(commentAuthor.id)
+                    } href=`/users/${commentAuthor.id}`)= commentAuthor.username
+                span.float-right= moment(commentCreatedAt).fromNow()
+                p= text
                 if user && (commentAuthor.id.equals(user._id) || user.isAdmin)
-                  a.btn.btn-sm.btn-outline-secondary.mr-2(href=`/trails/${trailId}/comments/${commentId}/edit`) Edit
+                  a.btn.btn-sm.btn-secondary.mr-2(href=`/trails/${trailId}/comments/${commentId}/edit`)
+                    | #[span.oi.oi-pencil(aria-hidden="true")] Edit
                   form.d-inline(action=`/trails/${trailId}/comments/${commentId}?_method=DELETE` method="POST")
-                    button.btn.btn-sm.btn-outline-danger Delete
+                    button.btn.btn-sm.btn-danger
+                      | #[span.oi.oi-trash(aria-hidden="true")] Delete
+    .col-md-3.order-md-0
+      #map.mb-4
 block scripts
-
   script(type='text/javascript').
     function initMap() {
       const lat = #{lat},

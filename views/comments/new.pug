@@ -4,7 +4,7 @@ block content
   h1.text-center.mb-4 Add New Comment to #{trail.name}
   .row
     .col-sm-10.col-md-8.col-lg-6.col-xl-4.mx-auto
-      form(action=`/trails/${trail._id}/comments`, method="POST")
+      form(action=`/trails/${trail._id}/comments` method="POST")
         .form-group
           input.form-control(type="text" name="comment[text]" placeholder="text")
         button.btn.btn-lg.btn-primary.btn-block Submit!

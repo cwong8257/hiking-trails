@@ -16,7 +16,8 @@ block content
           small: a.card-link(href=`mailto:${foundUser.email}`)= foundUser.email
         if user && (user._id.equals(foundUser._id) || user.isAdmin)
           .card-body.px-0
-            a.btn.btn-sm.btn-outline-secondary(href=`/users/${user._id}/edit`) Edit Profile
+            a.btn.btn-sm.btn-secondary(href=`/users/${user._id}/edit`)
+              | #[span.oi.oi-pencil(aria-hidden="true")] Edit Profile
     .col-md-9.mt-4.mt-md-0
       .row
         .col-12

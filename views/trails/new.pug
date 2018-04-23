@@ -7,18 +7,18 @@ block content
       form.mb-2(action="/trails" method="POST" enctype="multipart/form-data")
         .form-group
           label(for="name") Name
-          input.form-control(type="text" name="trail[name]" id="name" placeholder="Yosemite" required)
+          input.form-control(type="text" name="trail[name]" id="name" placeholder="Breakneck Ridge" required)
         .form-group
           label(for="estimatedTime") Estimated Time (minutes)
-          input.form-control(type="number" name="trail[estimatedTime]" id="estimatedTime" placeholder="9.99" min="0.00" step="0.01" required)
+          input.form-control(type="number" name="trail[estimatedTime]" id="estimatedTime" placeholder="240" min="1" step="1" required)
         .form-group
           label(for="image") Image
           input.form-control(type="file" name="image" id="image" accept="image/*" required)
         .form-group
           label(for="location") Location
-          input.form-control(type="text" name="trail[location]" id="location" placeholder="Yosemite National Park, CA")
+          input.form-control(type="text" name="trail[location]" id="location" placeholder="Breakneck Ridge, Philipstown, NY 10516")
         .form-group
           label(for="description") Description
-          input.form-control(type="text" name="trail[description]" id="description" placeholder="California’s Sierra Nevada mountains")
+          textarea.form-control(name="trail[description]" id="description" placeholder="Mountain along the Hudson River between Beacon and..." rows="4")
         button.btn.btn-lg.btn-primary.btn-block Save
       a(href="/trails") Go back
