@@ -135,7 +135,7 @@ router.put(
       }
       const savedTrail = await trail.save();
 
-      req.flash('success', 'Changes saved');
+      req.flash('success', `Saved changes to ${savedTrail.name}`);
       res.redirect('/trails/' + savedTrail._id);
     } catch (err) {
       req.flash('error', err.message);

@@ -3,24 +3,37 @@ extends ../layouts/layout
 block content
   - const {username, firstName, lastName, email, avatar, biography, _id } = foundUser
 
-  h1.text-center.mb-4 Edit #{username}'s Profile
+  h3.font-weight-light.text-center.mb-4 Edit public profile
   .row
-    .col-sm-8.col-md-6.col-lg-4.mx-auto
-      form.mb-2(action=`/users/${_id}?_method=PUT` method="POST")
-        .form-group
-          label(for="firstName") First Name
-          input.form-control(type="text" name="user[firstName]" id="firstName" value=firstName required)
-        .form-group
-          label(for="lastName") Last Name
-          input.form-control(type="text" name="user[lastName]" id="lastName" value=lastName required)
-        .form-group
-          label(for='email') Email
-          input.form-control(type="email" name="user[email]" id="email" value=email required)
-        .form-group
-          label(for='avatar') Avatar URL
-          input.form-control(type="text" name="user[avatar]" id="avatar" value=avatar)
-        .form-group
-          label(for='biography') About Me
-          textarea.form-control(name="user[biography]" id="biography" value=biography rows="4")
-        button.btn.btn-lg.btn-primary.btn-block Save Changes
-      a(href=`/users/${_id}`) Go back
+    .col-12.col-md-10.col-lg-8.mx-auto
+      form.mb-2(action=`/users/${_id}?_method=PUT` method="POST" enctype="multipart/form-data")
+        .row
+          .col-12.col-sm-6
+            .form-group
+              label(for="firstName") First name
+              input.form-control(type="text" name="firstName" id="firstName" value=firstName autofocus required)
+          .col-12.col-sm-6
+            .form-group
+              label(for="lastName") Last name
+              input.form-control(type="text" name="lastName" id="lastName" value=lastName required)
+        .row
+          .col-12.col-sm-6
+            .form-group
+              label(for='email') Email address
+              input.form-control(type="email" name="email" id="email" value=email required)
+          .col-12.col-sm-6
+            .form-group
+              label(for="avatar") Avatar
+              .input-group
+                .custom-file
+                  input.custom-file-input(type="file" name="avatar" id="avatar" accept="image/*")
+                  label.custom-file-label(for="avatar") Choose file...
+        .row
+          .col-12
+            .form-group
+              label(for="biography") About me
+              textarea.form-control(name="biography" id="biography" placeholder="Write a short description of yourself" rows="4")= biography
+        button.btn.btn-primary Update profile
+
+block scripts
+  script(src="/js/trails/new.js")

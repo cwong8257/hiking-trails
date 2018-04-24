@@ -4,6 +4,7 @@ const passport = require('passport');
 const User = require('../models/user');
 const Trail = require('../models/trail');
 const middleware = require('../middleware');
+const cloudinary = require('../libs/cloudinary');
 
 const router = express.Router();
 
@@ -20,29 +21,38 @@ router.get('/:userId', (req, res) => {
     });
 });
 
-router.put('/:userId', middleware.checkUserOwnership, (req, res) => {
+router.put('/:userId', middleware.checkUserOwnership, middleware.uploadImage.single('avatar'), async (req, res) => {
   const { userId } = req.params;
 
-  User.findByIdAndUpdate(userId, req.body.user)
-    .then(user => {
-      req.flash('success', `Saved changes to ${user.username}'s profile`);
-      res.redirect(`/users/${userId}`);
-    })
-    .catch(err => {
-      req.flash('error', err.message);
-      res.redirect(`/users/${userId}`);
-    });
+  try {
+    const user = await User.findById(userId);
+
+    if (req.file) {
+      cloudinary.v2.uploader.destroy(user.avatarId);
+      const result = await cloudinary.v2.uploader.upload(req.file.path);
+
+      user.avatarId = result.public_id;
+      user.avatar = result.secure_url;
+    }
+
+    const savedUser = await user.save();
+
+    req.flash('success', `Saved changes to ${savedUser.username}'s profile`);
+    res.redirect(`/users/${userId}`);
+  } catch (err) {
+    req.flash('error', err.message);
+    res.redirect(`/users/${userId}`);
+  }
 });
 
-router.get('/:userId/edit', middleware.checkUserOwnership, (req, res) => {
-  User.findById(req.params.userId)
-    .then(foundUser => {
-      res.render('users/edit', { foundUser });
-    })
-    .catch(err => {
-      req.flash('error', err.message);
-      res.redirect('/trails');
-    });
+router.get('/:userId/edit', middleware.checkUserOwnership, async (req, res) => {
+  try {
+    const foundUser = await User.findById(req.params.userId);
+    res.render('users/edit', { foundUser });
+  } catch (err) {
+    req.flash('error', err.message);
+    res.redirect('/trails');
+  }
 });
 
 module.exports = router;

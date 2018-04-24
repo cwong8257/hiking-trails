@@ -4,8 +4,8 @@ block content
   header.jumbotron
     h1 Welcome to HikingTrails!
     p View our hand-picked trails from all over the world
-    a.btn.btn-secondary.btn-lg(href="/trails/new")
-      | #[span.oi.oi-plus(aria-hidden="true")] Add New Trail
+    a.btn.btn-secondary.btn(href="/trails/new")
+      | #[span.oi.oi-plus(aria-hidden="true")] Add new trail
   .row
     if noMatch
       .col-12: p= noMatch
@@ -18,8 +18,8 @@ block content
             div.card-body
               h5.card-title #{name}
               p.card-subtitle.text-muted #{location}
-            div.card-body: a.card-link(href="/trails/" + _id) More Info
-  if pages && pages > 0
+            div.card-body: a.card-link(href="/trails/" + _id) More info
+  if pages && pages > 1
     .row
       .col-12
         nav(aria-label='Page navigation')
