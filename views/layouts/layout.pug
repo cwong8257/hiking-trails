@@ -24,14 +24,14 @@ html(lang="en")
           ul.navbar-nav
             if !user
               li.nav-item(class={active: page === 'login'}): a.nav-link(href="/login")
-                | #[span.oi.oi-account-login] Login
+                | #[span.oi.oi-account-login] Sign in
               li.nav-item(class={active: page === 'register'}): a.nav-link(href="/register")
-                | #[span.oi.oi-person] Sign Up
+                | #[span.oi.oi-person] Sign up
             else
               li.nav-item.active: a.nav-link(href=`/users/${user._id}`)
                 | #[span.oi.oi-person] #{user.username}
               li.nav-item: a.nav-link(href="/logout")
-                | #[span.oi.oi-account-logout] Logout
+                | #[span.oi.oi-account-logout] Sign out
     .container
       if success.length > 0
         .alert.alert-success(role="alert")

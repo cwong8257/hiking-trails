@@ -22,9 +22,10 @@ router.post('/register', async (req, res) => {
 
   try {
     const user = await User.register(newUser, password);
-    await passport.authenticate('local')(req, res);
-    req.flash('success', `Welcome to HikingTrails ${user.username}!`);
-    res.redirect('/trails');
+    passport.authenticate('local')(req, res, () => {
+      req.flash('success', `Welcome to HikingTrails ${user.username}!`);
+      res.redirect('/trails');
+    });
   } catch (err) {
     req.flash('error', err.message);
     res.redirect('back');
