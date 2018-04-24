@@ -60,76 +60,51 @@ router.get('/forgot', (req, res) => {
   res.render('forgot');
 });
 
-router.post('/forgot', (req, res) => {
-  new Promise((resolve, reject) => {
-    crypto.randomBytes(20, (err, buf) => {
-      if (err) {
-        return reject(err);
+router.post('/forgot', async (req, res) => {
+  try {
+    const buf = await crypto.randomBytes(20);
+    const token = buf.toString('hex');
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+      throw new Error("Can't find that email, sorry");
+    }
+
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000;
+    const savedUser = await user.save();
+    const smtpTransport = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'chriswong8257@gmail.com',
+        pass: process.env.GMAIL_PW
       }
-      const token = buf.toString('hex');
-      resolve(token);
     });
-  })
-    .then(token => {
-      return new Promise((resolve, reject) => {
-        User.findOne({ email: req.body.email }, (err, user) => {
-          if (err) {
-            return reject(err);
-          }
-          user.resetPasswordToken = token;
-          user.resetPasswordExpires = Date.now() + 3600000;
-          user.save(function(err) {
-            if (err) {
-              return reject(err);
-            }
-            resolve(user);
-          });
-        });
-      });
-    })
-    .then(user => {
-      return new Promise((resolve, reject) => {
-        const smtpTransport = nodemailer.createTransport({
-          service: 'Gmail',
-          auth: {
-            user: 'chriswong8257@gmail.com',
-            pass: process.env.GMAIL_PW
-          }
-        });
-        const mailOptions = {
-          to: user.email,
-          from: 'chriswong8257@gmail.com',
-          subject: 'Password Reset',
-          text: `
-            Hello ${user.firstName},
+    const mailOptions = {
+      to: user.email,
+      from: 'chriswong8257@gmail.com',
+      subject: 'Password Reset',
+      text: `
+          Hello ${savedUser.firstName},
   
-            You have requested a new password for your HikingTrails account.
+          You have requested a new password for your HikingTrails account.
   
-            Please click this link to set your new password:
-            http://${req.headers.host}/reset/${user.resetPasswordToken}
+          Please click this link to set your new password:
+          http://${req.headers.host}/reset/${savedUser.resetPasswordToken}
   
-            For security reasons, this link will expire in 60 minutes.
+          For security reasons, this link will expire in 60 minutes.
   
-            Best,
-            HikingTrails
-          `
-        };
-        smtpTransport.sendMail(mailOptions, err => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(user);
-        });
-      });
-    })
-    .then(user => {
-      req.flash('success', `An email has been sent to ${user.email} with further instructions`);
-      res.redirect('/login');
-    })
-    .catch(err => {
-      req.flash('error', err.message);
-      res.redirect('/forgot');
-    });
+          Best,
+          HikingTrails
+        `
+    };
+    await smtpTransport.sendMail(mailOptions);
+    req.flash('success', `An email has been sent to ${savedUser.email} with further instructions`);
+    res.redirect('/login');
+  } catch (err) {
+    req.flash('error', err.message);
+    res.redirect('/forgot');
+  }
 });
 
 router.get('/reset/:resetPasswordToken', (req, res) => {

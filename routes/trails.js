@@ -84,24 +84,23 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
   res.render('trails/new');
 });
 
-router.get('/:trailId', middleware.validateTrailId, (req, res) => {
+router.get('/:trailId', middleware.validateTrailId, async (req, res) => {
   const { trailId } = req.params;
 
-  Trail.findById(trailId)
-    .populate('comments')
-    .exec()
-    .then(trail => {
-      if (!trail) {
-        req.flash('error', 'Trail not found!');
-        res.redirect('/trails');
-      } else {
-        res.render('trails/show', { trail });
-      }
-    })
-    .catch(err => {
-      req.flash('error', err.message);
-      res.redirect('back');
-    });
+  try {
+    const trail = await Trail.findById(trailId)
+      .populate('comments')
+      .exec();
+
+    if (!trail) {
+      throw new Error('Trail not found!');
+    } else {
+      res.render('trails/show', { trail });
+    }
+  } catch (err) {
+    req.flash('error', err.message);
+    res.redirect('back');
+  }
 });
 
 router.put(
@@ -156,17 +155,16 @@ router.delete('/:trailId', middleware.checkTrailOwnership, async (req, res) => {
   }
 });
 
-router.get('/:trailId/edit', middleware.checkTrailOwnership, (req, res) => {
+router.get('/:trailId/edit', middleware.checkTrailOwnership, async (req, res) => {
   const { trailId } = req.params;
 
-  Trail.findById(trailId)
-    .then(trail => {
-      res.render('trails/edit', { trail });
-    })
-    .catch(err => {
-      req.flash('error', err.message);
-      res.redirect('/trails/' + trailId);
-    });
+  try {
+    const trail = await Trail.findById(trailId);
+    res.render('trails/edit', { trail });
+  } catch (err) {
+    req.flash('error', err.message);
+    res.redirect('/trails/' + trailId);
+  }
 });
 
 module.exports = router;
