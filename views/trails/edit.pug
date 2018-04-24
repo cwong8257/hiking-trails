@@ -1,28 +1,50 @@
 extends ../layouts/layout
 
 block content
-  - const { _id, name, estimatedTime, image, location, description } = trail
-
-  h1.text-center.mb-4 Edit #{name}
+  - const { _id, name, difficulty, estimatedTime, image, location, description } = trail
+  h3.font-weight-light.text-center.mb-4 Edit #{name}
   .row
-    .col-sm-10.col-md-8.col-lg-6.col-xl-4.mx-auto
-
+    .col-12.col-md-10.col-lg-8.mx-auto
       form.mb-2(action=`/trails/${_id}?_method=PUT` method="POST" enctype="multipart/form-data")
-        .form-group
-          label(for="name") Name
-          input.form-control(type="text" name="trail[name]" id="name" placeholder="Breakneck Ridge" value=name)
-        .form-group
-          label(for="estimatedTime") Estimated Time (minutes)
-          input.form-control(type="number" name="trail[estimatedTime]" id="estimatedTime" placeholder="240" min="1" step="1" value=estimatedTime required)
-        .form-group
-          label(for="image") Image
-          input.form-control(type="file" name="image" id="image" accept="image/*")
-        .form-group
-          label(for="location") Location
-          input.form-control(type="text" name="location" id="location" placeholder="Breakneck Ridge, Philipstown, NY 10516" value=location)
-        .form-group
-          label(for="description") Description
-          textarea.form-control(name="trail[description]" id="description" placeholder="Mountain along the Hudson River between Beacon and..." rows="4")= description
-        button.btn.btn-lg.btn-primary.btn-block Save Changes
+        .row
+          .col-12.col-sm-6
+            .form-group
+              label(for="name") Name
+              input.form-control(type="text" name="trail[name]" id="name" placeholder="Breakneck Ridge" value=name required)
+          .col-12.col-sm-6
+            .form-group
+              label(for="image") Image
+              .input-group
+                .custom-file
+                  input.custom-file-input(type="file" name="image" id="image" accept="image/*")
+                  label.custom-file-label(for="image") Choose file...
+        .row
+          .col-12.col-sm-6
+            .form-group
+              label(for="difficulty") Difficulty
+              .input-group
+                select#difficulty.custom-select(name="trail[difficulty]")
+                  option Choose difficulty...
+                  option(selected={difficulty: "Very Easy"} value='Very Easy') Very Easy
+                  option(selected={difficulty: "Easy"} value='Easy') Easy
+                  option(selected={difficulty: "Medium"} value='Medium') Medium
+                  option(selected={difficulty: "Hard"} value='Hard') Hard
+                  option(selected={difficulty: "Very Hard"} value='Very Hard') Very Hard
+          .col-12.col-sm-6
+            .form-group
+              label(for="estimatedTime") Estimated Time (minutes)
+              input.form-control(type="number" name="trail[estimatedTime]" id="estimatedTime" placeholder="240" min="1" step="1" value=estimatedTime required)
+        .row
+          .col-12
+            .form-group
+              label(for="location") Location
+              input.form-control(type="text" name="location" id="location" placeholder="Breakneck Ridge, Philipstown, NY 10516" value=location)
+        .row
+          .col-12
+            .form-group
+              label(for="description") Description
+              textarea.form-control(name="trail[description]" id="description" placeholder="Mountain along the Hudson River between Beacon and..." rows="4")= description
+        button.btn.btn-primary Edit trail
 
-      a(href="/trails") Go back
+block scripts
+  script(src="/js/trails/new.js")

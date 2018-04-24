@@ -4,6 +4,7 @@ const trailSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   name: String,
   estimatedTime: Number,
+  difficulty: String,
   image: String,
   imageId: String,
   description: String,

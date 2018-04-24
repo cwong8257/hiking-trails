@@ -1,18 +1,19 @@
 extends ../layouts/layout
 
 block content
-  - const {  _id: trailId, createdAt: trailCreatedAt, author: trailAuthor, name, estimatedTime, image, description, location, lat, lng, comments } = trail;
+  - const {  _id: trailId, createdAt: trailCreatedAt, author: trailAuthor, name, difficulty, estimatedTime, image, description, location, lat, lng, comments } = trail;
 
   .row
     .col-md-9.order-md-1
       .card.mb-4
         img.card-img-top(src=image alt=name)
         div.card-body
-          h5.float-right
+          .float-right.text-muted
             | #[span.oi.oi-timer] ~#{moment.duration(parseInt(estimatedTime), 'minutes').humanize()}
-          h5= name
-          p= description
-          p: em Submitted by: #[a(href=`/users/${trailAuthor.id}`) #{trailAuthor.username}], #{moment(trailCreatedAt).fromNow()}
+          h5.card-title= name
+          p.card-subtitle.mb-3.text-muted= difficulty
+          p.card-text= description
+          p.card-text: em Submitted by: #[a(href=`/users/${trailAuthor.id}`) #{trailAuthor.username}], #{moment(trailCreatedAt).fromNow()}
           if user && (trailAuthor.id.equals(user._id) || user.isAdmin)
             a.btn.btn-sm.btn-secondary.mr-2(href=`/trails/${trailId}/edit`)
               | #[span.oi.oi-pencil(aria-hidden="true")] Edit

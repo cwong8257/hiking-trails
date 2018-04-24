@@ -48,54 +48,49 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', middleware.isLoggedIn, middleware.uploadImage, (req, res) => {
-  const author = { id: req.user._id, username: req.user.username };
-  const { name, description, estimatedTime, location } = req.body.trail;
+router.post('/', middleware.isLoggedIn, middleware.uploadImage, async (req, res) => {
+  try {
+    const author = { id: req.user._id, username: req.user.username };
+    const { name, difficulty, estimatedTime, location, description } = req.body.trail;
+    const data = await geocoder.geocode(location);
 
-  geocoder
-    .geocode(location)
-    .then(
-      data => {
-        if (!data.length) {
-          Promise.reject({ reason: 'Invalid location', redirect: 'back' });
+    if (!data.length) {
+      throw new Error('Invalid location');
+    }
+    const lat = data[0].latitude;
+    const lng = data[0].longitude;
+    const formattedLocation = data[0].formattedAddress;
+
+    const trail = await new Promise((resolve, reject) => {
+      cloudinary.v2.uploader.upload(req.file.path, (err, result) => {
+        if (err) {
+          return reject(err);
         }
-        const lat = data[0].latitude;
-        const lng = data[0].longitude;
-        const location = data[0].formattedAddress;
+        const image = result.secure_url;
+        const imageId = result.public_id;
+        const newTrail = {
+          name,
+          difficulty,
+          description,
+          estimatedTime,
+          author,
+          location: formattedLocation,
+          lat,
+          lng,
+          image,
+          imageId
+        };
 
-        return new Promise((resolve, reject) => {
-          cloudinary.v2.uploader.upload(req.file.path, (err, result) => {
-            if (err) {
-              return reject(err);
-            }
-            const image = result.secure_url;
-            const imageId = result.public_id;
-            const newTrail = { name, description, estimatedTime, author, location, lat, lng, image, imageId };
-
-            resolve(Trail.create(newTrail));
-          });
-        });
-      },
-      err => {
-        req.flash('error', 'Invalid location');
-        res.redirect('back');
-      }
-    )
-    .then(
-      trail => {
-        req.flash('success', trail.name + ' has been created!');
-        res.redirect('/trails/' + trail._id);
-      },
-      err => {
-        req.flash('error', err.reason);
-        res.redirect(err.redirect);
-      }
-    )
-    .catch(err => {
-      console.log(err);
-      req.flash('error', err.message);
-      res.redirect('/trails/new');
+        resolve(newTrail);
+      });
     });
+    await Trail.create(trail);
+    req.flash('success', trail.name + ' has been created!');
+    res.redirect('/trails/' + trail._id);
+  } catch (err) {
+    req.flash('error', err.message);
+    res.redirect('back');
+  }
 });
 
 router.get('/new', middleware.isLoggedIn, (req, res) => {
@@ -136,7 +131,6 @@ router.put(
       if (!data[0]) {
         throw new Error('Invalid location');
       }
-
       const trail = await Trail.findById(trailId);
       trail.lat = data[0].latitude;
       trail.lng = data[0].longitude;
