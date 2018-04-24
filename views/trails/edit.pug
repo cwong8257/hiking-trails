@@ -25,14 +25,14 @@ block content
               .input-group
                 select#difficulty.custom-select(name="trail[difficulty]")
                   option Choose difficulty...
-                  option(selected={difficulty: "Very Easy"} value='Very Easy') Very Easy
+                  option(selected={difficulty: "Very easy"} value='Very easy') Very easy
                   option(selected={difficulty: "Easy"} value='Easy') Easy
                   option(selected={difficulty: "Medium"} value='Medium') Medium
                   option(selected={difficulty: "Hard"} value='Hard') Hard
-                  option(selected={difficulty: "Very Hard"} value='Very Hard') Very Hard
+                  option(selected={difficulty: "Very hard"} value='Very hard') Very hard
           .col-12.col-sm-6
             .form-group
-              label(for="estimatedTime") Estimated Time (minutes)
+              label(for="estimatedTime") Estimated time (minutes)
               input.form-control(type="number" name="trail[estimatedTime]" id="estimatedTime" placeholder="240" min="1" step="1" value=estimatedTime required)
         .row
           .col-12

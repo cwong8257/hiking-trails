@@ -13,7 +13,7 @@ block content
           h5.card-title= name
           p.card-subtitle.mb-3.text-muted= difficulty
           p.card-text= description
-          p.card-text: em Submitted by: #[a(href=`/users/${trailAuthor.id}`) #{trailAuthor.username}], #{moment(trailCreatedAt).fromNow()}
+          p.card-text Submitted by #[a(href=`/users/${trailAuthor.id}`) #{trailAuthor.username}], #{moment(trailCreatedAt).format('MMM DD, YYYY')}
           if user && (trailAuthor.id.equals(user._id) || user.isAdmin)
             a.btn.btn-sm.btn-secondary.mr-2(href=`/trails/${trailId}/edit`)
               | #[span.oi.oi-pencil(aria-hidden="true")] Edit
@@ -47,9 +47,8 @@ block content
         .row.my-4
           .col-md-12
             hr
-            span.float-right.text-muted= moment(commentCreatedAt).fromNow()
-            strong
-              h5
+            p
+              span.h5
                 span.oi.oi-person
                 |
                 |
@@ -57,6 +56,9 @@ block content
                   'badge-info': user && user._id.equals(commentAuthor.id),
                   'badge-primary': trailAuthor.id.equals(commentAuthor.id)
                 } href=`/users/${commentAuthor.id}`)= commentAuthor.username
+              span.small.text-muted
+                | 
+                | #{moment(commentCreatedAt).fromNow()}
             p= text
             if user && (commentAuthor.id.equals(user._id) || user.isAdmin)
               a.btn.btn-sm.btn-secondary.mr-2(data-toggle="collapse" href=`#collapseEdit${commentId}` role="button" aria-expanded="false" aria-controls="editCommentForm")
