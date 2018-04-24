@@ -11,14 +11,14 @@ block content
               form.mb-2(action="/login" method="POST")
                 .form-group
                   label(for="username") Username
-                  input.form-control(type="text" name="username" id="username" autofocus required)
-                span.small.float-right: a(href="/forgot") Forgot password?
+                  input.form-control(type="text" name="username" id="username" tabindex="1" autofocus required)
+                span.small.float-right: a(href="/forgot" tabindex="4") Forgot password?
                 .form-group
                   label(for="password") Password
-                  input.form-control(type="password" name="password" id="password" required)
-                button.btn.btn-primary.btn-block Sign in
+                  input.form-control(type="password" name="password" id="password" tabindex="2" required)
+                button.btn.btn-primary.btn-block(tabindex="3") Sign in
       .row.text-center
         .col-12
           .card
             .card-body
-              | New to HikingTrails? #[a(href="/register") Create an account].
+              | New to HikingTrails? #[a(href="/register" tabindex="5") Create an account].
