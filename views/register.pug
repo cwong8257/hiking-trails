@@ -1,7 +1,7 @@
 extends layouts/layout
 
 block content
-  h1.text-center.mb-4 Sign Up
+  h1.text-center.mb-4 Join HikingTrails
   .row
     .col-12.col-md-10.col-lg-8.mx-auto
       form.mb-2(action="/register" method="POST")
@@ -33,5 +33,4 @@ block content
             .form-group
               label(for="biography") Biography
               textarea.form-control(name="biography" id="biography" placeholder="Write a short description of yourself" rows="4")
-        button.btn.btn-lg.btn-primary.btn-block Sign Up
-      a(href="/trails") Go back
+        button.btn.btn-primary Create an account
