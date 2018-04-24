@@ -4,7 +4,7 @@ block content
   h1.text-center.mb-4 Join HikingTrails
   .row
     .col-12.col-md-10.col-lg-8.mx-auto
-      form.mb-2(action="/register" method="POST")
+      form.mb-2(action="/register" method="POST" enctype="multipart/form-data")
         .row
           .col-12.col-sm-6
             .form-group
@@ -28,9 +28,19 @@ block content
             .form-group
               label(for='email') Email
               input.form-control(type="email" name="email" id="email" required)
+          .col-12.col-sm-6
+            .form-group
+              label(for="avatar") Avatar
+              .input-group
+                .custom-file
+                  input.custom-file-input(type="file" name="avatar" id="avatar" accept="image/*" required)
+                  label.custom-file-label(for="avatar") Choose file...
         .row
           .col-12
             .form-group
               label(for="biography") Biography
               textarea.form-control(name="biography" id="biography" placeholder="Write a short description of yourself" rows="4")
         button.btn.btn-primary Create an account
+
+block scripts
+  script(src="/js/trails/new.js")

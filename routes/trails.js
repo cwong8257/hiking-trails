@@ -48,46 +48,33 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', middleware.isLoggedIn, middleware.uploadImage, async (req, res) => {
+router.post('/', middleware.isLoggedIn, middleware.uploadImage.single('image'), async (req, res) => {
+  const { name, difficulty, estimatedTime, location, description } = req.body.trail;
+
   try {
-    const author = { id: req.user._id, username: req.user.username };
-    const { name, difficulty, estimatedTime, location, description } = req.body.trail;
     const data = await geocoder.geocode(location);
 
     if (!data.length) {
       throw new Error('Invalid location');
     }
-    const lat = data[0].latitude;
-    const lng = data[0].longitude;
-    const formattedLocation = data[0].formattedAddress;
-
-    const trail = await new Promise((resolve, reject) => {
-      cloudinary.v2.uploader.upload(req.file.path, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        const image = result.secure_url;
-        const imageId = result.public_id;
-        const newTrail = {
-          name,
-          difficulty,
-          description,
-          estimatedTime,
-          author,
-          location: formattedLocation,
-          lat,
-          lng,
-          image,
-          imageId
-        };
-
-        resolve(newTrail);
-      });
-    });
-    await Trail.create(trail);
-    req.flash('success', trail.name + ' has been created!');
-    res.redirect('/trails/' + trail._id);
+    const result = await cloudinary.v2.uploader.upload(req.file.path);
+    const trail = {
+      name,
+      difficulty,
+      description,
+      estimatedTime,
+      author: { id: req.user._id, username: req.user.username },
+      location: data[0].formattedAddress,
+      lat: data[0].latitude,
+      lng: data[0].longitude,
+      image: result.secure_url,
+      imageId: result.public_id
+    };
+    const newTrail = await Trail.create(trail);
+    req.flash('success', newTrail.name + ' has been created!');
+    res.redirect('/trails/' + newTrail._id);
   } catch (err) {
+    console.log(err);
     req.flash('error', err.message);
     res.redirect('back');
   }
@@ -121,7 +108,7 @@ router.put(
   '/:trailId',
   middleware.validateTrailId,
   middleware.checkTrailOwnership,
-  middleware.uploadImage,
+  middleware.uploadImage.single('image'),
   async (req, res) => {
     const { trailId } = req.params;
 
@@ -140,7 +127,7 @@ router.put(
       trail.estimatedTime = req.body.trail.estimatedTime;
 
       if (req.file) {
-        await cloudinary.v2.uploader.destroy(trail.imageId);
+        cloudinary.v2.uploader.destroy(trail.imageId);
         const result = await cloudinary.v2.uploader.upload(req.file.path);
 
         trail.imageId = result.public_id;

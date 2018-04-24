@@ -5,6 +5,8 @@ const crypto = require('crypto');
 
 const User = require('../models/user');
 const Trail = require('../models/trail');
+const middleware = require('../middleware');
+const cloudinary = require('../libs/cloudinary');
 
 const router = express.Router();
 
@@ -16,12 +18,22 @@ router.get('/register', (req, res) => {
   res.render('register', { page: 'register' });
 });
 
-router.post('/register', async (req, res) => {
-  const { firstName, lastName, email, username, password, biography } = req.body;
-  const newUser = new User({ firstName, lastName, email, username, biography });
+router.post('/register', middleware.uploadImage.single('avatar'), async (req, res) => {
+  const { firstName, lastName, username, password, email, biography } = req.body;
 
   try {
+    const result = await cloudinary.v2.uploader.upload(req.file.path);
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      username,
+      biography,
+      avatar: result.secure_url,
+      avatarId: result.public_id
+    });
     const user = await User.register(newUser, password);
+
     passport.authenticate('local')(req, res, () => {
       req.flash('success', `Welcome to HikingTrails ${user.username}!`);
       res.redirect('/trails');
