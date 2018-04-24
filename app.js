@@ -18,8 +18,9 @@ const Trail = require('./models/trail'),
   userRoutes = require('./routes/users');
 
 const app = express();
+const port = process.env.PORT || 3000;
 
-mongoose.connect('mongodb://localhost/hikingtrails');
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/hikingtrails');
 
 app.set('view engine', 'pug');
 app.locals.moment = require('moment');
@@ -44,6 +45,6 @@ app.use('/users', userRoutes);
 app.use('/trails', trailRoutes);
 app.use('/trails/:trailId/comments', commentRoutes);
 
-app.listen(3000, () => {
-  console.log('Server is running!');
+app.listen(port, () => {
+  console.log(`Started up at port ${port}`);
 });
