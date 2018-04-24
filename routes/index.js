@@ -51,9 +51,10 @@ router.get('/login', middleware.publicRoute, (req, res) => {
 router.post('/login', passport.authenticate('local', { successRedirect: '/trails', failureRedirect: '/login' }));
 
 router.get('/logout', (req, res) => {
-  req.logout();
-  req.flash('success', 'Logged you out!');
-  res.redirect('/trails');
+  if (req.user) {
+    req.logout();
+  }
+  res.redirect('/');
 });
 
 router.get('/forgot', (req, res) => {
