@@ -10,11 +10,11 @@ const cloudinary = require('../libs/cloudinary');
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
+router.get('/', middleware.publicRoute, (req, res) => {
   res.render('landing');
 });
 
-router.get('/register', (req, res) => {
+router.get('/register', middleware.publicRoute, (req, res) => {
   res.render('register', { page: 'register' });
 });
 
@@ -44,7 +44,7 @@ router.post('/register', middleware.uploadImage.single('avatar'), async (req, re
   }
 });
 
-router.get('/login', (req, res) => {
+router.get('/login', middleware.publicRoute, (req, res) => {
   res.render('login', { page: 'login' });
 });
 

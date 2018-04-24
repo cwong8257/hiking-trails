@@ -28,5 +28,11 @@ module.exports = {
     }
     req.flash('error', 'You need to be logged in to do that!');
     res.redirect('/login');
+  },
+  publicRoute(req, res, next) {
+    if (!req.user) {
+      return next();
+    }
+    res.redirect('/trails');
   }
 };
