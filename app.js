@@ -1,21 +1,19 @@
 require('dotenv').config();
 
-const express = require('express'),
-  bodyParser = require('body-parser'),
-  mongoose = require('mongoose'),
-  passport = require('passport'),
-  LocalStrategy = require('passport-local'),
-  expressSession = require('express-session'),
-  methodOverride = require('method-override'),
-  flash = require('connect-flash');
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const expressSession = require('express-session');
+const methodOverride = require('method-override');
+const flash = require('connect-flash');
 
-const Trail = require('./models/trail'),
-  User = require('./models/user'),
-  Comment = require('./models/comment'),
-  indexRoutes = require('./routes/index'),
-  trailRoutes = require('./routes/trails'),
-  commentRoutes = require('./routes/comments'),
-  userRoutes = require('./routes/users');
+const User = require('./models/user');
+const indexRoutes = require('./routes/index');
+const trailRoutes = require('./routes/trails');
+const commentRoutes = require('./routes/comments');
+const userRoutes = require('./routes/users');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,7 +22,8 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/hikingtrails');
 
 app.set('view engine', 'pug');
 app.locals.moment = require('moment');
-app.use(express.static(__dirname + '/public'));
+
+app.use(express.static(`${__dirname}/public`));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(expressSession({ secret: 'Once again Rust wins cutest dog!', resave: false, saveUninitialized: false }));
@@ -45,6 +44,4 @@ app.use('/users', userRoutes);
 app.use('/trails', trailRoutes);
 app.use('/trails/:trailId/comments', commentRoutes);
 
-app.listen(port, () => {
-  console.log(`Started up at port ${port}`);
-});
+app.listen(port, () => {});

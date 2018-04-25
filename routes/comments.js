@@ -33,11 +33,11 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
     })
     .then(trail => {
       req.flash('success', 'Comment added!');
-      res.redirect('/trails/' + trailId);
+      res.redirect(`/trails/${trailId}`);
     })
     .catch(err => {
       req.flash('error', err.message);
-      res.redirect('/trails/' + trailId);
+      res.redirect(`/trails/${trailId}`);
     });
 });
 
@@ -52,7 +52,7 @@ router.get('/:commentId/edit', middleware.validateTrailId, middleware.checkComme
         })
         .catch(err => {
           req.flash('error', err.message);
-          res.redirect('/trails/' + trailId);
+          res.redirect(`/trails/${trailId}`);
         });
     } else {
       req.flash('error', 'Trail does not exist');
@@ -67,10 +67,10 @@ router.put('/:commentId', middleware.validateTrailId, middleware.checkCommentOwn
   Comment.findByIdAndUpdate(commentId, req.body.comment)
     .then(comment => {
       req.flash('success', 'Changes saved');
-      res.redirect('/trails/' + trailId);
+      res.redirect(`/trails/${trailId}`);
     })
     .catch(err => {
-      res.redirect('/trails/' + trailId);
+      res.redirect(`/trails/${trailId}`);
     });
 });
 
@@ -80,7 +80,7 @@ router.delete('/:commentId', middleware.validateTrailId, middleware.checkComment
   Comment.findByIdAndRemove(commentId)
     .then(() => {
       req.flash('success', 'Comment deleted!');
-      res.redirect('/trails/' + trailId);
+      res.redirect(`/trails/${trailId}`);
     })
     .catch(err => {
       req.flash('error', err.message);

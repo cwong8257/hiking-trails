@@ -10,7 +10,7 @@ const imageFilter = (req, file, cb) => {
   if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
     return cb(new Error('Only image files are allowed!'), false);
   }
-  cb(null, true);
+  return cb(null, true);
 };
 
 module.exports = { uploadImage: multer({ storage, fileFilter: imageFilter }) };

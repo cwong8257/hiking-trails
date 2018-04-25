@@ -13,7 +13,6 @@ module.exports = {
           }
         })
         .catch(err => {
-          console.log(err);
           req.flash('error', 'User not found!');
           res.redirect('back');
         });
@@ -27,12 +26,12 @@ module.exports = {
       return next();
     }
     req.flash('error', 'You need to be logged in to do that!');
-    res.redirect('/login');
+    return res.redirect('/login');
   },
   publicRoute(req, res, next) {
     if (!req.user) {
       return next();
     }
-    res.redirect('/trails');
+    return res.redirect('/trails');
   }
 };

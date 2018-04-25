@@ -1,5 +1,3 @@
-const mongoose = require('mongoose');
-
 const trailMiddleware = require('./trails');
 const commentMiddleware = require('./comments');
 const userMiddleware = require('./users');

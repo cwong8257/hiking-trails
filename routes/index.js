@@ -1,12 +1,11 @@
 const express = require('express');
 const passport = require('passport');
-const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
 const User = require('../models/user');
-const Trail = require('../models/trail');
 const middleware = require('../middleware');
 const cloudinary = require('../libs/cloudinary');
+const nodemailer = require('../libs/nodemailer');
 
 const router = express.Router();
 
@@ -70,36 +69,15 @@ router.post('/forgot', async (req, res) => {
     if (!user) {
       throw new Error("Can't find that email, sorry");
     }
-
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000;
     const savedUser = await user.save();
-    const smtpTransport = nodemailer.createTransport({
-      service: 'Gmail',
-      auth: {
-        user: 'chriswong8257@gmail.com',
-        pass: process.env.GMAIL_PW
-      }
-    });
-    const mailOptions = {
-      to: user.email,
-      from: 'chriswong8257@gmail.com',
-      subject: 'Password Reset',
-      text: `
-          Hello ${savedUser.firstName},
-  
-          You have requested a new password for your HikingTrails account.
-  
-          Please click this link to set your new password:
-          http://${req.headers.host}/reset/${savedUser.resetPasswordToken}
-  
-          For security reasons, this link will expire in 60 minutes.
-  
-          Best,
-          HikingTrails
-        `
-    };
-    await smtpTransport.sendMail(mailOptions);
+    await nodemailer.sendPasswordReset(
+      req.body.email,
+      savedUser.firstName,
+      req.headers.host,
+      savedUser.resetPasswordToken
+    );
     req.flash('success', `An email has been sent to ${savedUser.email} with further instructions`);
     res.redirect('/login');
   } catch (err) {
@@ -108,99 +86,50 @@ router.post('/forgot', async (req, res) => {
   }
 });
 
-router.get('/reset/:resetPasswordToken', (req, res) => {
+router.get('/reset/:resetPasswordToken', async (req, res) => {
   const { resetPasswordToken } = req.params;
 
-  User.findOne({ resetPasswordToken, resetPasswordExpires: { $gt: Date.now() } })
-    .then(user => {
-      if (!user) {
-        req.flash('error', 'Password reset link is invalid or has expired');
-        res.redirect('/forgot');
-      } else {
-        res.render('reset', { resetPasswordToken });
-      }
-    })
-    .catch(err => {
-      req.flash('error', 'Something went wrong!');
-      res.redirect('/forgot');
-    });
+  try {
+    const user = await User.findOne({ resetPasswordToken, resetPasswordExpires: { $gt: Date.now() } });
+
+    if (!user) {
+      throw new Error('Password reset link is invalid or has expired');
+    }
+    res.render('reset', { resetPasswordToken });
+  } catch (err) {
+    req.flash('error', err.message);
+    res.redirect('/forgot');
+  }
 });
 
-router.post('/reset/:resetPasswordToken', (req, res) => {
+router.post('/reset/:resetPasswordToken', async (req, res) => {
   const { password, confirm } = req.body;
   const { resetPasswordToken } = req.params;
 
-  User.findOne({ resetPasswordToken, resetPasswordExpires: { $gt: Date.now() } })
-    .then(user => {
-      if (!user) {
-        Promise.reject({ reason: 'Password reset link is invalid or has expired', redirect: '/forgot' });
-      } else if (password !== confirm) {
-        Promise.reject({ reason: 'Passwords do not match', redirect: 'back' });
-      } else {
-        return user.setPassword(password);
-      }
-    })
-    .then(
-      user => {
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
+  try {
+    let user = await User.findOne({ resetPasswordToken, resetPasswordExpires: { $gt: Date.now() } });
 
-        return user.save();
-      },
-      err => {
-        req.flash('error', err.reason);
-        res.redirect(err.redirect);
+    if (!user) {
+      throw new Error('Password reset link is invalid or has expired');
+    } else if (password !== confirm) {
+      throw new Error('Passwords do not match');
+    }
+    user = await user.setPassword(password);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    user = await user.save();
+    req.logIn(user, async err => {
+      if (err) {
+        throw new Error('Something went wrong!');
       }
-    )
-    .then(user => {
-      return new Promise((resolve, reject) => {
-        req.logIn(user, err => {
-          if (err) {
-            return reject(err);
-          } else {
-            resolve(user);
-          }
-        });
-      });
-    })
-    .then(user => {
-      return new Promise((resolve, reject) => {
-        const smtpTransport = nodemailer.createTransport({
-          service: 'Gmail',
-          auth: {
-            user: 'chriswong8257@gmail.com',
-            pass: process.env.GMAIL_PW
-          }
-        });
-        const mailOptions = {
-          to: user.email,
-          from: 'chriswong8257@gmail.com',
-          subject: 'Your password changed',
-          text: `
-            Hi ${user.firstName},
-  
-            This is a confirmation that the password for your account ${user.email} was recently changed.
-  
-            Best,
-            HikingTrails
-          `
-        };
-        smtpTransport.sendMail(mailOptions, err => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(user);
-        });
-      });
-    })
-    .then(() => {
+      await nodemailer.sendPasswordResetConfirmation(user.email, user.firstName);
       req.flash('success', 'Success! Your password has been changed');
       res.redirect('/trails');
-    })
-    .catch(err => {
-      req.flash('error', 'Something went wrong!');
-      res.redirect('/forgot');
     });
+  } catch (err) {
+    req.flash('error', err.message);
+    res.redirect('/forgot');
+  }
 });
 
 module.exports = router;

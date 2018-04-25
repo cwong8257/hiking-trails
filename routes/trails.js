@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require('mongoose');
 
 const Trail = require('../models/trail');
 const middleware = require('../middleware');
@@ -8,15 +7,13 @@ const cloudinary = require('../libs/cloudinary');
 
 const router = express.Router();
 
-const escapeRegex = text => {
-  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-};
+const escapeRegex = text => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 
 router.get('/', async (req, res) => {
   const { search } = req.query;
   const perPage = 8;
-  const pageQuery = parseInt(req.query.page);
-  const pageNumber = pageQuery ? pageQuery : 1;
+  const pageQuery = parseInt(req.query.page, 10);
+  const pageNumber = pageQuery || 1;
 
   if (search) {
     const regex = new RegExp(escapeRegex(search), 'gi');
@@ -71,10 +68,9 @@ router.post('/', middleware.isLoggedIn, middleware.uploadImage.single('image'), 
       imageId: result.public_id
     };
     const newTrail = await Trail.create(trail);
-    req.flash('success', newTrail.name + ' has been created!');
-    res.redirect('/trails/' + newTrail._id);
+    req.flash('success', `${newTrail.name} has been created!`);
+    res.redirect(`/trails/${newTrail._id}`);
   } catch (err) {
-    console.log(err);
     req.flash('error', err.message);
     res.redirect('back');
   }
@@ -135,7 +131,7 @@ router.put(
       const savedTrail = await trail.save();
 
       req.flash('success', `Saved changes to ${savedTrail.name}`);
-      res.redirect('/trails/' + savedTrail._id);
+      res.redirect(`/trails/${savedTrail._id}`);
     } catch (err) {
       req.flash('error', err.message);
       res.redirect('back');
@@ -147,7 +143,7 @@ router.delete('/:trailId', middleware.checkTrailOwnership, async (req, res) => {
   try {
     const trail = await Trail.findByIdAndRemove(req.params.trailId);
     cloudinary.v2.uploader.destroy(trail.imageId);
-    req.flash('success', trail.name + ' has been deleted!');
+    req.flash('success', `${trail.name} has been deleted!`);
     res.redirect('/trails');
   } catch (err) {
     req.flash('error', err.message);
@@ -163,7 +159,7 @@ router.get('/:trailId/edit', middleware.checkTrailOwnership, async (req, res) =>
     res.render('trails/edit', { trail });
   } catch (err) {
     req.flash('error', err.message);
-    res.redirect('/trails/' + trailId);
+    res.redirect(`/trails/${trailId}`);
   }
 });
 
