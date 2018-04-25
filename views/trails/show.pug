@@ -88,9 +88,18 @@ block scripts
           zoom: 8,
           center
       });
+      const contentString = '<h6>#{location}</h6>';
+
+      var infowindow = new google.maps.InfoWindow({
+        content: contentString,
+        maxWidth: 150
+      });
       const marker = new google.maps.Marker({
           position: center,
           map
+      });
+      marker.addListener('click', function() {
+        infowindow.open(map, marker);
       });
     }
   script(async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcPdVnaRp4htTr7WSzJVVwUTutCOpGYkU&callback=initMap")

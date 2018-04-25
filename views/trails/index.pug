@@ -16,9 +16,9 @@ block content
           .card.mb-3
             img.card-img-top(src=image)
             div.card-body
-              h5.card-title #{name}
-              p.card-subtitle.text-muted #{location}
-            div.card-body: a.card-link(href="/trails/" + _id) More info
+              h5.card-title= name
+              p.card-subtitle.text-muted.small= location
+            div.card-body: a.card-link(href=`/trails/${_id}`) More info
   if pages && pages > 1
     .row
       .col-12
