@@ -8,9 +8,11 @@ block content
       .card.border-0
         img.card-img-top(src=imageSrc alt=fullName)
         .card-body.px-0
-          h2.h4.card-title= fullName
-          p.card-text.text-muted= `Joined ${moment(createdAt).format('MMMM DD[,] YYYY')}`
-          if foundUser.biography
+          h4.card-title= fullName
+          h5.card-subtitle.text-muted.mb-3= foundUser.username
+          small: p.card-subtitle.text-muted= `Joined ${moment(createdAt).format('MMMM DD[,] YYYY')}`
+        if foundUser.biography
+          .card-body.px-0
             p.card-text= foundUser.biography
         .card-body.px-0
           small: a.card-link(href=`mailto:${foundUser.email}`)= foundUser.email
@@ -21,20 +23,22 @@ block content
     .col-md-9.mt-4.mt-md-0
       .row
         .col-12
-          h1.h4= `${foundUser.username}'s Trails`
-      .row
-        .col-12
-          each trail in trails
-            - const { createdAt, image, location, comments, name, _id, description } = trail;
-              hr
-              ul.list-unstyled
-                li
-                  .row
-                    .col-7.col-sm-8.col-md-9
-                      h5.mb-2: a(href=`/trails/${_id}`)= name
-                      h6= location
-                      small.text-muted= `${comments.length} Comments - ${moment(createdAt).fromNow()}`
-                    .col-5.col-sm-4.col-md-3
-                      div.bg-black.img-responsive
-                        img.img-fluid.mh-100(src=image alt=name)
+          h4 Trails
+          if trails.length === 0
+            hr
+            em: p.text-center.text-muted No trails found
+          else
+            each trail in trails
+              - const { createdAt, image, location, comments, name, _id, description } = trail;
+                hr
+                ul.list-unstyled
+                  li
+                    .row
+                      .col-7.col-sm-8.col-md-9
+                        h5.mb-2: a(href=`/trails/${_id}`)= name
+                        h6= location
+                        small.text-muted= `${comments.length} Comments - ${moment(createdAt).fromNow()}`
+                      .col-5.col-sm-4.col-md-3
+                        div.bg-black.img-responsive
+                          img.img-fluid.mh-100(src=image alt=name)
 

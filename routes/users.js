@@ -8,17 +8,19 @@ const cloudinary = require('../libs/cloudinary');
 
 const router = express.Router();
 
-router.get('/:userId', (req, res) => {
-  User.findById(req.params.userId)
-    .then(foundUser => {
-      Trail.find({ 'author.id': foundUser._id }).then(trails => {
-        res.render('users/show', { foundUser, trails });
-      });
-    })
-    .catch(err => {
-      req.flash('error', err.message);
-      res.redirect('/trails');
-    });
+router.get('/:userId', async (req, res) => {
+  try {
+    const foundUser = await User.findById(req.params.userId);
+
+    if (!foundUser) {
+      throw new Error('User not found');
+    }
+    const trails = await Trail.find({ 'author.id': foundUser._id });
+    res.render('users/show', { foundUser, trails });
+  } catch (err) {
+    req.flash('error', err.message);
+    res.redirect('/trails');
+  }
 });
 
 router.put('/:userId', middleware.checkUserOwnership, middleware.uploadImage.single('avatar'), async (req, res) => {
@@ -26,6 +28,14 @@ router.put('/:userId', middleware.checkUserOwnership, middleware.uploadImage.sin
 
   try {
     const user = await User.findById(userId);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+    user.firstName = req.body.firstName;
+    user.lastName = req.body.lastName;
+    user.email = req.body.email;
+    user.biography = req.body.biography;
 
     if (req.file) {
       cloudinary.v2.uploader.destroy(user.avatarId);
@@ -48,6 +58,10 @@ router.put('/:userId', middleware.checkUserOwnership, middleware.uploadImage.sin
 router.get('/:userId/edit', middleware.checkUserOwnership, async (req, res) => {
   try {
     const foundUser = await User.findById(req.params.userId);
+
+    if (!foundUser) {
+      throw new Error('User not found');
+    }
     res.render('users/edit', { foundUser });
   } catch (err) {
     req.flash('error', err.message);
